@@ -1,39 +1,84 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
-data = {
-    'Free': [10, 0, 8, 1, 12, 0, 9, 2, 15, 1],
-    'Offer': [8, 1, 7, 0, 10, 1, 8, 1, 12, 0],
-    'Money': [7, 0, 6, 1, 8, 0, 7, 1, 9, 0],
-    'Spam': [1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
-}
+emails = [
+    "Congratulations you have won a free prize",
+    "You have won a lottery reward",
+    "Claim your free gift now",
+    "Win cash prize today",
+    "Get free money immediately",
+    "You are a lucky winner",
+    "Click here to claim your reward",
+    "Congratulations claim your bonus",
+    "Free vacation offer for you",
+    "You won a free shopping voucher",
+    "Please attend the meeting tomorrow",
+    "Submit your assignment before Monday",
+    "Your project report is ready",
+    "The class starts at 10 AM",
+    "Please send the project file",
+    "Your meeting is scheduled for Friday",
+    "Please review the document",
+    "The examination timetable is available",
+    "Thank you for your information",
+    "Your application has been received"
+]
 
-df = pd.DataFrame(data)
-X = df[['Free', 'Offer', 'Money']]
-y = df['Spam']
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+labels = [
+    1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1,
+    0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0
+]
+
+vectorizer = CountVectorizer()
+
+X = vectorizer.fit_transform(emails)
+
 model = LogisticRegression()
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
-print("Actual Labels:", list(y_test))
-print("Predicted Labels:", list(y_pred))
 
-print("\nAccuracy:", accuracy_score(y_test, y_pred))
+model.fit(X, labels)
 
-print("\nClassification Report:")
-print(classification_report(y_test, y_pred))
-new_email = pd.DataFrame({
-    'Free': [11],
-    'Offer': [9],
-    'Money': [8]
-})
+new_email = input("Enter email message: ")
 
-prediction = model.predict(new_email)
+new_email_features = vectorizer.transform([new_email])
+
+prediction = model.predict(new_email_features)
+
+probability = model.predict_proba(new_email_features)
+
+confidence = max(probability[0]) * 100
+
+words = new_email.lower().split()
+
+print("\n==============================================")
+print("          EMAIL SPAM DETECTION SYSTEM")
+print("==============================================")
+
+print("\nINPUT EMAIL")
+print("----------------------------------------------")
+print("Message:", new_email)
+
+print("\nANALYSIS")
+print("----------------------------------------------")
+print("Feature Extraction : Word Frequency")
+print("Classification     : Logistic Regression")
+print("Confidence         :", round(confidence, 2), "%")
 
 if prediction[0] == 1:
-    print("\nPrediction: Spam Email")
+    print("\nRESULT")
+    print("----------------------------------------------")
+    print("Classification     : SPAM EMAIL")
+    print("Reason             : Suspicious promotional or")
+    print("                     prize-related content detected.")
+    print("Recommended Action : Move the email to Spam/Junk folder.")
 else:
-    print("\nPrediction: Not Spam")
+    print("\nRESULT")
+    print("----------------------------------------------")
+    print("Classification     : NON-SPAM EMAIL")
+    print("Reason             : The email appears to contain")
+    print("                     normal personal or professional content.")
+    print("Recommended Action : Deliver the email to the Inbox.")
+
+print("\n==============================================")
+print("          EMAIL ANALYSIS COMPLETED")
+print("==============================================")
