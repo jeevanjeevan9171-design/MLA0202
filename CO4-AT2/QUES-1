@@ -1,140 +1,43 @@
 import matplotlib.pyplot as plt
 
-training_data = [
-    [
-        ("John", "CUSTOMER"),
-        ("ordered", "O"),
-        ("Laptop", "PRODUCT"),
-        ("Order123", "ORDER_ID")
-    ],
-    [
-        ("Priya", "CUSTOMER"),
-        ("bought", "O"),
-        ("Phone", "PRODUCT"),
-        ("Order456", "ORDER_ID")
-    ],
-    [
-        ("Rahul", "CUSTOMER"),
-        ("purchased", "O"),
-        ("Headphones", "PRODUCT"),
-        ("Order789", "ORDER_ID")
-    ],
-    [
-        ("Anita", "CUSTOMER"),
-        ("ordered", "O"),
-        ("Keyboard", "PRODUCT"),
-        ("Order234", "ORDER_ID")
-    ]
-]
+history = 0.10
+unknown_location = 0.20
+new_device = 0.25
+high_amount = 0.30
 
-def get_features(word):
-
-    features = []
-
-    if word[0].isupper():
-        features.append("CAPITAL")
-
-    if word.lower().startswith("order"):
-        features.append("ORDER")
-
-    if any(char.isdigit() for char in word):
-        features.append("NUMBER")
-
-    features.append(word.lower())
-
-    return features
-
-
-word_labels = {}
-
-for sentence in training_data:
-
-    for word, label in sentence:
-        word_labels[word.lower()] = label
-
-
-test_sentence = [
-    "Kiran",
-    "ordered",
-    "Laptop",
-    "Order999"
-]
-
-predicted_labels = []
-
-for word in test_sentence:
-
-    word_lower = word.lower()
-
-    if word_lower in word_labels:
-        label = word_labels[word_lower]
-
-    elif word_lower.startswith("order"):
-        label = "ORDER_ID"
-
-    elif any(char.isdigit() for char in word):
-        label = "ORDER_ID"
-
-    elif word[0].isupper():
-        label = "CUSTOMER"
-
-    else:
-        label = "O"
-
-    predicted_labels.append(label)
-
-
-print("CONDITIONAL RANDOM FIELD")
-print("------------------------")
-
-print("\nInput Sentence:")
-print(" ".join(test_sentence))
-
-print("\nPredicted Labels:")
-
-for word, label in zip(test_sentence, predicted_labels):
-    print(word, "->", label)
-
-
-# Graph
-label_values = {
-    "O": 0,
-    "CUSTOMER": 1,
-    "PRODUCT": 2,
-    "ORDER_ID": 3
-}
-
-values = []
-
-for label in predicted_labels:
-    values.append(label_values[label])
-
-plt.figure(figsize=(9, 5))
-
-plt.plot(
-    range(len(test_sentence)),
-    values,
-    marker="o",
-    linewidth=2
+fraud = (
+    history * 0.90 +
+    unknown_location * 0.80 +
+    new_device * 0.70 +
+    high_amount * 0.60
 )
 
-plt.xticks(
-    range(len(test_sentence)),
-    test_sentence
+fraud = min(fraud, 1)
+legitimate = 1 - fraud
+
+print("FRAUD DETECTION RESULT")
+print("----------------------")
+print("Previous Fraud History :", history * 100, "%")
+print("Unknown Location       :", unknown_location * 100, "%")
+print("New Device             :", new_device * 100, "%")
+print("High Transaction Amount:", high_amount * 100, "%")
+print()
+print("Fraud Probability      :", round(fraud * 100, 2), "%")
+print("Legitimate Probability :", round(legitimate * 100, 2), "%")
+
+if fraud >= 0.5:
+    print("Prediction: FRAUDULENT")
+else:
+    print("Prediction: LEGITIMATE")
+
+plt.bar(
+    ["Legitimate", "Fraudulent"],
+    [legitimate, fraud]
 )
 
-plt.yticks(
-    [0, 1, 2, 3],
-    ["O", "CUSTOMER", "PRODUCT", "ORDER_ID"]
-)
-
-plt.xlabel("Words")
-plt.ylabel("Entity Label")
-
-plt.title("Named Entity Recognition using CRF")
-
-plt.grid(True, alpha=0.3)
-
-plt.tight_layout()
+plt.title("Credit Card Fraud Prediction")
+plt.xlabel("Transaction Type")
+plt.ylabel("Probability")
+plt.ylim(0, 1)
 
 plt.show()
