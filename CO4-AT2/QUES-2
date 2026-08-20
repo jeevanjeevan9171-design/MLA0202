@@ -1,1 +1,87 @@
+import matplotlib.pyplot as plt
 
+# Prior probabilities
+P_Obesity = {
+    "No": 0.65,
+    "Yes": 0.35
+}
+
+P_HighSugar = {
+    "No": 0.70,
+    "Yes": 0.30
+}
+
+# Conditional Probability Table
+CPT = {
+    ("No", "No"): 0.05,
+    ("No", "Yes"): 0.40,
+    ("Yes", "No"): 0.30,
+    ("Yes", "Yes"): 0.80
+}
+
+# Patient symptoms
+obesity = "Yes"
+high_sugar = "Yes"
+
+# Inference
+diabetes = CPT[(obesity, high_sugar)]
+no_diabetes = 1 - diabetes
+
+print("BAYESIAN NETWORK - DIABETES PREDICTION")
+print("---------------------------------------")
+print("Obesity:", obesity)
+print("High Blood Sugar:", high_sugar)
+
+print("\nProbability of Diabetes:",
+      round(diabetes * 100, 2), "%")
+
+print("Probability of No Diabetes:",
+      round(no_diabetes * 100, 2), "%")
+
+if diabetes >= 0.5:
+    print("\nPrediction: DIABETES")
+else:
+    print("\nPrediction: NO DIABETES")
+
+# Bayesian Network visualization
+plt.figure(figsize=(8, 5))
+
+plt.text(0.2, 0.65, "Obesity",
+         ha="center", va="center",
+         fontsize=13, fontweight="bold",
+         bbox=dict(boxstyle="round,pad=0.5",
+                   facecolor="lightblue"))
+
+plt.text(0.2, 0.30, "High Blood Sugar",
+         ha="center", va="center",
+         fontsize=13, fontweight="bold",
+         bbox=dict(boxstyle="round,pad=0.5",
+                   facecolor="lightblue"))
+
+plt.text(0.75, 0.48, "Diabetes",
+         ha="center", va="center",
+         fontsize=13, fontweight="bold",
+         bbox=dict(boxstyle="round,pad=0.5",
+                   facecolor="lightgreen"))
+
+# Arrows
+plt.annotate("",
+             xy=(0.63, 0.49),
+             xytext=(0.32, 0.63),
+             arrowprops=dict(arrowstyle="->", lw=2))
+
+plt.annotate("",
+             xy=(0.63, 0.47),
+             xytext=(0.32, 0.32),
+             arrowprops=dict(arrowstyle="->", lw=2))
+
+plt.title(
+    "Bayesian Network for Diabetes Prediction\n"
+    "Predicted Probability = 80%"
+)
+
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+plt.axis("off")
+plt.tight_layout()
+plt.show()
