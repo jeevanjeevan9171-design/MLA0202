@@ -1,1 +1,59 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+states = ["Healthy", "Warning", "Failure"]
+
+transition = np.array([
+    [0.80, 0.18, 0.02],
+    [0.10, 0.75, 0.15],
+    [0.02, 0.18, 0.80]
+])
+
+emission = np.array([
+    [0.85, 0.15],
+    [0.40, 0.60],
+    [0.10, 0.90]
+])
+
+observations = [0, 0, 0, 1, 1, 1, 1, 1, 0, 1]
+
+current_state = 0
+predicted = []
+
+for observation in observations:
+    probabilities = (
+        transition[current_state] *
+        emission[:, observation]
+    )
+
+    current_state = np.argmax(probabilities)
+    predicted.append(current_state)
+
+print("MACHINE CONDITION")
+print("-----------------")
+
+for i, state in enumerate(predicted, 1):
+    print("Time", i, ":", states[state])
+
+print()
+print("Final Machine State:", states[predicted[-1]])
+
+if predicted[-1] == 2:
+    print("Action: Immediate maintenance required")
+elif predicted[-1] == 1:
+    print("Action: Schedule maintenance")
+else:
+    print("Action: Machine operating normally")
+
+plt.step(
+    range(1, len(predicted) + 1),
+    np.array(predicted) + 1,
+    where="mid"
+)
+
+plt.yticks([1, 2, 3], states)
+plt.xlabel("Time")
+plt.ylabel("Machine Condition")
+plt.title("Predictive Machine Maintenance Using HMM")
+plt.grid(axis="y", alpha=0.3)
+plt.show()
