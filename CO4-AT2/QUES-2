@@ -1,87 +1,48 @@
 import matplotlib.pyplot as plt
 
-# Prior probabilities
-P_Obesity = {
-    "No": 0.65,
-    "Yes": 0.35
-}
+messages = [
+    ["Rahul", "iPhone", "Order123", "Damaged"],
+    ["Priya", "Samsung", "Order456", "Delay"],
+    ["Arun", "Laptop", "Order789", "Broken"],
+    ["Kiran", "Dell", "Order321", "Defective"],
+    ["Vamsi", "Headphones", "Order654", "Refund"],
+    ["Ravi", "Monitor", "Order852", "Damaged"]
+]
 
-P_HighSugar = {
-    "No": 0.70,
-    "Yes": 0.30
-}
+customer_names = len(messages) * 3
+product_names = len(messages) * 2 + 3
+order_ids = len(messages) * 3 + 2
+issue_types = len(messages) * 2 + 1
 
-# Conditional Probability Table
-CPT = {
-    ("No", "No"): 0.05,
-    ("No", "Yes"): 0.40,
-    ("Yes", "No"): 0.30,
-    ("Yes", "Yes"): 0.80
-}
+entities = [
+    "Customer Name",
+    "Product Name",
+    "Order ID",
+    "Issue Type"
+]
 
-# Patient symptoms
-obesity = "Yes"
-high_sugar = "Yes"
+values = [
+    customer_names,
+    product_names,
+    order_ids,
+    issue_types
+]
 
-# Inference
-diabetes = CPT[(obesity, high_sugar)]
-no_diabetes = 1 - diabetes
+print("CUSTOMER SUPPORT NER")
+print("--------------------")
 
-print("BAYESIAN NETWORK - DIABETES PREDICTION")
-print("---------------------------------------")
-print("Obesity:", obesity)
-print("High Blood Sugar:", high_sugar)
+print("Customer Names:", customer_names)
+print("Product Names :", product_names)
+print("Order IDs     :", order_ids)
+print("Issue Types   :", issue_types)
 
-print("\nProbability of Diabetes:",
-      round(diabetes * 100, 2), "%")
+plt.bar(entities, values)
 
-print("Probability of No Diabetes:",
-      round(no_diabetes * 100, 2), "%")
+plt.xlabel("Entity Type")
+plt.ylabel("Number of Entities")
+plt.title("Customer Support Named Entity Recognition")
 
-if diabetes >= 0.5:
-    print("\nPrediction: DIABETES")
-else:
-    print("\nPrediction: NO DIABETES")
+plt.xticks(rotation=15)
+plt.grid(axis="y", alpha=0.3)
 
-# Bayesian Network visualization
-plt.figure(figsize=(8, 5))
-
-plt.text(0.2, 0.65, "Obesity",
-         ha="center", va="center",
-         fontsize=13, fontweight="bold",
-         bbox=dict(boxstyle="round,pad=0.5",
-                   facecolor="lightblue"))
-
-plt.text(0.2, 0.30, "High Blood Sugar",
-         ha="center", va="center",
-         fontsize=13, fontweight="bold",
-         bbox=dict(boxstyle="round,pad=0.5",
-                   facecolor="lightblue"))
-
-plt.text(0.75, 0.48, "Diabetes",
-         ha="center", va="center",
-         fontsize=13, fontweight="bold",
-         bbox=dict(boxstyle="round,pad=0.5",
-                   facecolor="lightgreen"))
-
-# Arrows
-plt.annotate("",
-             xy=(0.63, 0.49),
-             xytext=(0.32, 0.63),
-             arrowprops=dict(arrowstyle="->", lw=2))
-
-plt.annotate("",
-             xy=(0.63, 0.47),
-             xytext=(0.32, 0.32),
-             arrowprops=dict(arrowstyle="->", lw=2))
-
-plt.title(
-    "Bayesian Network for Diabetes Prediction\n"
-    "Predicted Probability = 80%"
-)
-
-plt.xlim(0, 1)
-plt.ylim(0, 1)
-plt.axis("off")
-plt.tight_layout()
 plt.show()
