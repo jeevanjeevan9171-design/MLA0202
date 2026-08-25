@@ -1,1 +1,111 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+np.random.seed(7)
+
+ads = ["Ad A", "Ad B", "Ad C", "Ad D", "Ad E"]
+
+true_ctr = np.array([
+    0.08, 0.13, 0.10, 0.18, 0.12
+])
+
+T = 10000
+
+counts = np.zeros(5, dtype=int)
+clicks = np.zeros(5, dtype=int)
+
+cumulative = []
+total_clicks = 0
+
+for t in range(T):
+
+    if t < 5:
+        ad = t
+
+    else:
+        mean = clicks / np.maximum(counts, 1)
+
+        bonus = np.sqrt(
+            2 * np.log(t + 1) /
+            np.maximum(counts, 1)
+        )
+
+        ucb = mean + bonus
+        ad = int(np.argmax(ucb))
+
+    reward = np.random.binomial(
+        1, true_ctr[ad]
+    )
+
+    counts[ad] += 1
+    clicks[ad] += reward
+
+    total_clicks += reward
+    cumulative.append(total_clicks)
+
+estimated_ctr = clicks / counts
+
+best_ad = ads[
+    int(np.argmax(estimated_ctr))
+]
+
+plt.figure(figsize=(9, 5))
+
+plt.plot(
+    cumulative,
+    label="UCB cumulative clicks"
+)
+
+plt.xlabel("User interactions")
+plt.ylabel("Cumulative clicks")
+
+plt.title(
+    "Online Advertisement Selection using UCB1"
+)
+
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.show()
+
+plt.figure(figsize=(8, 5))
+
+plt.bar(
+    ads,
+    estimated_ctr,
+    label="Estimated CTR"
+)
+
+plt.axhline(
+    true_ctr.max(),
+    linestyle="--",
+    label="Best true CTR"
+)
+
+plt.xlabel("Advertisement")
+plt.ylabel("Click-through rate")
+
+plt.title(
+    "Estimated CTR after 10,000 interactions"
+)
+
+plt.legend()
+plt.grid(axis="y", alpha=0.3)
+plt.show()
+
+print("EXPERIMENT 2 OUTPUT")
+
+for i in range(5):
+    print(
+        ads[i],
+        "shown:", counts[i],
+        "clicks:", clicks[i],
+        "estimated CTR:",
+        round(estimated_ctr[i], 4)
+    )
+
+print("Best selected advertisement:", best_ad)
+print("Total clicks:", total_clicks)
+print(
+    "Overall CTR:",
+    round(total_clicks / T, 4)
+)
