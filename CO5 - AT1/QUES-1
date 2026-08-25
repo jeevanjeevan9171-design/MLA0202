@@ -1,1 +1,150 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+np.random.seed(7)
+
+rows, cols = 6, 7
+start = (5, 0)
+goal = (0, 6)
+
+obstacles = {
+    (1, 2), (1, 3), (2, 3),
+    (3, 1), (4, 1), (4, 4)
+}
+
+actions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+action_names = ["U", "D", "L", "R"]
+
+states = [(r, c) for r in range(rows)
+          for c in range(cols)
+          if (r, c) not in obstacles]
+
+def move(s, a):
+    if np.random.rand() < 0.10:
+        a = np.random.randint(4)
+
+    nr = s[0] + actions[a][0]
+    nc = s[1] + actions[a][1]
+
+    if (nr < 0 or nr >= rows or
+        nc < 0 or nc >= cols or
+        (nr, nc) in obstacles):
+        return s, -5
+
+    if (nr, nc) == goal:
+        return (nr, nc), 100
+
+    return (nr, nc), -1
+
+V = {s: 0.0 for s in states}
+gamma = 0.90
+
+for _ in range(150):
+    newV = V.copy()
+
+    for s in states:
+        if s == goal:
+            continue
+
+        values = []
+
+        for a in range(4):
+            total = 0
+
+            ns, r = move(s, a)
+            total += 0.90 * (r + gamma * V[ns])
+
+            for random_action in range(4):
+                ns2, r2 = move(s, random_action)
+                total += 0.025 * (r2 + gamma * V[ns2])
+
+            values.append(total)
+
+        newV[s] = max(values)
+
+    V = newV
+
+policy = {}
+
+for s in states:
+    if s == goal:
+        policy[s] = "G"
+        continue
+
+    values = []
+
+    for a in range(4):
+        total = 0
+
+        ns, r = move(s, a)
+        total += 0.90 * (r + gamma * V[ns])
+
+        for random_action in range(4):
+            ns2, r2 = move(s, random_action)
+            total += 0.025 * (r2 + gamma * V[ns2])
+
+        values.append(total)
+
+    policy[s] = action_names[np.argmax(values)]
+
+path = [start]
+s = start
+total_reward = 0
+
+for step in range(25):
+    if s == goal:
+        break
+
+    a = action_names.index(policy[s])
+    s, reward = move(s, a)
+
+    total_reward += reward
+    path.append(s)
+
+    if s == goal:
+        break
+
+grid = np.zeros((rows, cols))
+
+for r, c in obstacles:
+    grid[r, c] = -1
+
+grid[start] = 2
+grid[goal] = 3
+
+for r, c in path[1:-1]:
+    grid[r, c] = 4
+
+plt.figure(figsize=(8, 6))
+plt.imshow(grid, cmap="viridis")
+
+for r in range(rows):
+    for c in range(cols):
+        if (r, c) in obstacles:
+            plt.text(c, r, "X", ha="center", va="center", fontsize=16)
+        elif (r, c) == start:
+            plt.text(c, r, "S", ha="center", va="center", fontsize=14)
+        elif (r, c) == goal:
+            plt.text(c, r, "G", ha="center", va="center", fontsize=14)
+
+for i, (r, c) in enumerate(path):
+    plt.text(c, r, str(i), ha="center", va="bottom", fontsize=8)
+
+plt.title(
+    f"Warehouse Robot - Value Iteration | "
+    f"Moves={len(path)-1}, Reward={total_reward}"
+)
+
+plt.xticks(range(cols))
+plt.yticks(range(rows))
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print("EXPERIMENT 1 OUTPUT")
+print("Start:", start)
+print("Goal:", goal)
+print("Learned path:", path)
+print("Moves used:", len(path) - 1)
+print("Total reward:", total_reward)
+print("Battery used:", len(path) - 1, "units")
+print("Reached goal:", s == goal)
