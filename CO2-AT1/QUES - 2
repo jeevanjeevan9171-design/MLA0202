@@ -1,1 +1,106 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
 
+X = np.array([
+    [3, 2],
+    [2, 1],
+    [1, 0],
+    [3, 3],
+    [0, 1]
+])
+
+y = np.array([1, 1, 0, 1, 0])
+
+model = LogisticRegression()
+model.fit(X, y)
+
+b0 = model.intercept_[0]
+b1 = model.coef_[0][0]
+b2 = model.coef_[0][1]
+
+print("====================================")
+print("       EMAIL SPAM CLASSIFICATION")
+print("====================================")
+
+print("\n(i) Classification Model:")
+print("P(Spam) = 1 / (1 + e^-(b0 + b1*Offer + b2*Win))")
+
+print("\nRegression Coefficients:")
+print("b0 (Intercept) =", round(b0, 4))
+print("b1 (Offer)     =", round(b1, 4))
+print("b2 (Win)       =", round(b2, 4))
+
+print("\nClassification Equation:")
+print(
+    "z =",
+    round(b0, 4),
+    "+",
+    round(b1, 4),
+    "* Offer",
+    "+",
+    round(b2, 4),
+    "* Win"
+)
+
+print("\n(ii) Decision Boundary:")
+print(
+    round(b0, 4),
+    "+",
+    round(b1, 4),
+    "* Offer",
+    "+",
+    round(b2, 4),
+    "* Win = 0"
+)
+
+new_email = np.array([[2, 1]])
+
+prediction = model.predict(new_email)
+probability = model.predict_proba(new_email)
+
+print("\n(iii) New Email:")
+print("Offer Word Frequency = 2")
+print("Win Word Frequency   = 1")
+
+if prediction[0] == 1:
+    print("Prediction: SPAM")
+else:
+    print("Prediction: NOT SPAM")
+
+print("Probability of NOT SPAM =", round(probability[0][0], 4))
+print("Probability of SPAM     =", round(probability[0][1], 4))
+
+offer = X[:, 0]
+win = X[:, 1]
+
+plt.figure(figsize=(8, 5))
+
+plt.scatter(
+    offer[y == 0],
+    win[y == 0],
+    label="Not Spam"
+)
+
+plt.scatter(
+    offer[y == 1],
+    win[y == 1],
+    label="Spam"
+)
+
+plt.scatter(
+    new_email[0][0],
+    new_email[0][1],
+    marker="*",
+    s=200,
+    label="New Email"
+)
+
+plt.xlabel("Offer Word Frequency")
+plt.ylabel("Win Word Frequency")
+plt.title("Email Spam Classification")
+
+plt.legend()
+plt.grid(True)
+
+plt.show()
