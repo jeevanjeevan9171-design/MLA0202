@@ -1,1 +1,94 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+X = np.array([
+    [1, 1],
+    [1, 0],
+    [0, 1],
+    [1, 1],
+    [0, 0]
+])
+
+y = np.array([1, 1, 0, 1, 0])
+
+total = len(y)
+
+yes_count = np.sum(y == 1)
+no_count = np.sum(y == 0)
+
+prior_yes = yes_count / total
+prior_no = no_count / total
+
+fever_yes = np.sum((X[:, 0] == 1) & (y == 1)) / yes_count
+headache_yes = np.sum((X[:, 1] == 0) & (y == 1)) / yes_count
+
+fever_no = np.sum((X[:, 0] == 1) & (y == 0)) / no_count
+headache_no = np.sum((X[:, 1] == 0) & (y == 0)) / no_count
+
+yes_probability = prior_yes * fever_yes * headache_yes
+no_probability = prior_no * fever_no * headache_no
+
+total_probability = yes_probability + no_probability
+
+disease_probability = yes_probability / total_probability
+
+print("====================================")
+print("        NAIVE BAYES CLASSIFIER")
+print("====================================")
+
+print("\n(i) Prior Probabilities:")
+print("P(Disease = Yes) =", round(prior_yes, 4))
+print("P(Disease = No)  =", round(prior_no, 4))
+
+print("\n(ii) Conditional Probabilities:")
+print("P(Fever = 1 | Disease = Yes) =", round(fever_yes, 4))
+print("P(Headache = 0 | Disease = Yes) =", round(headache_yes, 4))
+print("P(Fever = 1 | Disease = No) =", round(fever_no, 4))
+print("P(Headache = 0 | Disease = No) =", round(headache_no, 4))
+
+print("\n(iii) New Patient:")
+print("Fever = 1")
+print("Headache = 0")
+
+print("\nProbability for Disease = Yes =", round(yes_probability, 4))
+print("Probability for Disease = No  =", round(no_probability, 4))
+
+print("\nFinal Probability:")
+print("P(Disease = Yes | Fever=1, Headache=0) =",
+      round(disease_probability, 4))
+
+if disease_probability >= 0.5:
+    print("\nPrediction: DISEASE = YES")
+else:
+    print("\nPrediction: DISEASE = NO")
+
+labels = [
+    "Prior Yes",
+    "Prior No",
+    "Fever|Yes",
+    "Headache|Yes",
+    "Fever|No",
+    "Headache|No"
+]
+
+values = [
+    prior_yes,
+    prior_no,
+    fever_yes,
+    headache_yes,
+    fever_no,
+    headache_no
+]
+
+plt.figure(figsize=(9, 5))
+
+plt.bar(labels, values)
+
+plt.xlabel("Probability Type")
+plt.ylabel("Probability")
+plt.title("Naive Bayes Probability Analysis")
+
+plt.ylim(0, 1.1)
+plt.grid(axis="y")
+
+plt.show()
