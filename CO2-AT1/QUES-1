@@ -1,1 +1,85 @@
+import numpy as np
+import matplotlib.pyplot as plt
 
+X = np.array([
+    [1000, 2],
+    [1500, 3],
+    [800, 2],
+    [1200, 3],
+    [2000, 4]
+], dtype=float)
+
+y = np.array([50, 75, 40, 60, 90], dtype=float)
+
+X_matrix = np.column_stack((np.ones(len(X)), X))
+
+beta = np.linalg.inv(X_matrix.T @ X_matrix) @ X_matrix.T @ y
+
+beta0 = beta[0]
+beta1 = beta[1]
+beta2 = beta[2]
+
+predicted = X_matrix @ beta
+
+print("====================================")
+print("   HOUSE PRICE LINEAR REGRESSION")
+print("====================================")
+
+print("\n(i) Linear Regression Model:")
+print("Price = β0 + β1(Area) + β2(Bedrooms)")
+
+print("\n(ii) Regression Coefficients:")
+print("Beta 0 (Intercept) =", round(beta0, 4))
+print("Beta 1 (Area)      =", round(beta1, 4))
+print("Beta 2 (Bedrooms)  =", round(beta2, 4))
+
+print("\nRegression Equation:")
+print("Price =", round(beta0, 4),
+      "+", round(beta1, 4), "* Area",
+      "+", round(beta2, 4), "* Bedrooms")
+
+print("\nPredicted Prices:")
+
+for i in range(len(y)):
+    print("House", i + 1,
+          ": Actual =", y[i],
+          "Lakhs, Predicted =",
+          round(predicted[i], 2),
+          "Lakhs")
+
+print("\n(iii) Interpretation:")
+print("Beta 0 =", round(beta0, 4),
+      "is the intercept/base price.")
+
+print("Beta 1 =", round(beta1, 4),
+      "represents the change in price for 1 sq.ft increase in area.")
+
+print("Beta 2 =", round(beta2, 4),
+      "represents the change in price for one additional bedroom.")
+
+area = X[:, 0]
+
+order = np.argsort(area)
+
+plt.figure(figsize=(8, 5))
+
+plt.scatter(
+    area,
+    y,
+    label="Actual House Prices"
+)
+
+plt.plot(
+    area[order],
+    predicted[order],
+    label="Regression Line"
+)
+
+plt.xlabel("Area (sq.ft)")
+plt.ylabel("Price (₹ Lakhs)")
+plt.title("House Area vs House Price")
+
+plt.legend()
+plt.grid(True)
+
+plt.show()
